@@ -34,17 +34,17 @@ export default function QuickLogger({
   const currentType = currentRecord ? currentRecord.type : null;
   const currentWage = currentType ? (rates[currentType] ?? 0) : null;
 
+  // Keep note synchronized with current selected date record
+  React.useEffect(() => {
+    setNote(records[selectedDate]?.note || '');
+  }, [selectedDate, records]);
+
   // Move date back 1 day
   const handlePrevDay = () => {
     const d = parseDateKey(selectedDate);
     d.setDate(d.getDate() - 1);
     const newKey = formatDateKey(d);
     setSelectedDate(newKey);
-    if (records[newKey]?.note) {
-      setNote(records[newKey].note);
-    } else {
-      setNote('');
-    }
   };
 
   // Move date forward 1 day
@@ -53,26 +53,16 @@ export default function QuickLogger({
     d.setDate(d.getDate() + 1);
     const newKey = formatDateKey(d);
     setSelectedDate(newKey);
-    if (records[newKey]?.note) {
-      setNote(records[newKey].note);
-    } else {
-      setNote('');
-    }
   };
 
   // Jump to today
   const handleToday = () => {
     const todayKey = formatDateKey(new Date());
     setSelectedDate(todayKey);
-    if (records[todayKey]?.note) {
-      setNote(records[todayKey].note);
-    } else {
-      setNote('');
-    }
   };
 
   const handleSelectType = (typeKey) => {
-    onSaveAttendance(selectedDate, typeKey, note || currentRecord?.note || '');
+    onSaveAttendance(selectedDate, typeKey, note.trim());
   };
 
   const isToday = selectedDate === formatDateKey(new Date());
@@ -247,7 +237,7 @@ export default function QuickLogger({
             <input 
               type="text" 
               placeholder="e.g. Overtime, Site A, Heavy rain shift..."
-              value={note || currentRecord?.note || ''}
+              value={note}
               onChange={(e) => setNote(e.target.value)}
               style={{ flex: 1, fontSize: '13px', padding: '8px 12px' }}
             />
@@ -255,7 +245,7 @@ export default function QuickLogger({
               <button
                 type="button"
                 onClick={() => {
-                  onSaveAttendance(selectedDate, currentRecord.type, note);
+                  onSaveAttendance(selectedDate, currentRecord.type, note.trim());
                 }}
                 style={{
                   background: 'var(--bg-input)',
@@ -263,7 +253,8 @@ export default function QuickLogger({
                   borderRadius: 'var(--radius-sm)',
                   padding: '0 12px',
                   fontSize: '12px',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  cursor: 'pointer'
                 }}
               >
                 Save Note

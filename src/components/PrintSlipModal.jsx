@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, Printer, Download, CheckCircle2 } from 'lucide-react';
-import { formatDisplayDate, formatINR } from '../utils/dateUtils';
+import { formatDisplayDate, formatINR, formatDateKey } from '../utils/dateUtils';
 import { ATTENDANCE_TYPES } from '../constants';
 
 const MONTH_NAMES = [
@@ -17,6 +17,16 @@ export default function PrintSlipModal({
   rates, 
   settings 
 }) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   // Filter records for the selected month
@@ -131,7 +141,7 @@ export default function PrintSlipModal({
                   {monthName} {year}
                 </span>
                 <p style={{ fontSize: '11px', color: '#6b7280', marginTop: 4 }}>
-                  Generated on {formatDisplayDate(new Date().toISOString().slice(0, 10))}
+                  Generated on {formatDisplayDate(formatDateKey(new Date()))}
                 </p>
               </div>
             </div>

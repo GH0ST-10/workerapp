@@ -13,9 +13,12 @@ export function formatDateKey(date = new Date()) {
 
 // Parses YYYY-MM-DD string into local Date object safely
 export function parseDateKey(dateStr) {
-  if (!dateStr) return new Date();
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return new Date(year, month - 1, day);
+  if (!dateStr || typeof dateStr !== 'string') return new Date();
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+    return new Date();
+  }
+  return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
 }
 
 // Formats YYYY-MM-DD to human readable string, e.g. "Sat, 24 Oct 2026"

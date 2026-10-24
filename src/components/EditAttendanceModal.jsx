@@ -39,16 +39,28 @@ export default function EditAttendanceModal({
     }
   }, [initialDate, records, isOpen]);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const currentRecord = records[date];
 
   const handleSave = () => {
-    onSaveAttendance(date, selectedType, note);
+    if (!date) return;
+    onSaveAttendance(date, selectedType, note.trim());
     onClose();
   };
 
   const handleDelete = () => {
+    if (!date) return;
     if (window.confirm(`Are you sure you want to remove attendance for ${formatDisplayDate(date)}?`)) {
       onDeleteAttendance(date);
       onClose();
@@ -98,6 +110,7 @@ export default function EditAttendanceModal({
               value={date} 
               onChange={(e) => {
                 const newDate = e.target.value;
+                if (!newDate) return;
                 setDate(newDate);
                 const rec = records[newDate];
                 if (rec) {
@@ -108,6 +121,7 @@ export default function EditAttendanceModal({
                 }
               }}
               style={{ width: '100%' }}
+              required
             />
           </div>
 

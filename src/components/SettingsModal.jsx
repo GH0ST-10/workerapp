@@ -33,6 +33,16 @@ export default function SettingsModal({
     }
   }, [settings, isOpen]);
 
+  // Handle ESC key to close modal
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleChange = (field, value) => {
@@ -40,7 +50,7 @@ export default function SettingsModal({
   };
 
   const handleRateChange = (type, value) => {
-    const num = Math.max(0, parseInt(value, 10) || 0);
+    const num = value === '' ? '' : Math.max(0, parseInt(value, 10) || 0);
     setFormData(prev => ({
       ...prev,
       rates: {
@@ -52,7 +62,18 @@ export default function SettingsModal({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSaveSettings(formData);
+    const sanitized = {
+      ...formData,
+      workerName: (formData.workerName || '').trim(),
+      companyName: (formData.companyName || '').trim(),
+      monthlyTarget: Math.max(500, parseInt(formData.monthlyTarget, 10) || 15000),
+      rates: {
+        FULL: Math.max(0, parseInt(formData.rates?.FULL, 10) || 500),
+        HALF: Math.max(0, parseInt(formData.rates?.HALF, 10) || 300),
+        ABSENT: 0
+      }
+    };
+    onSaveSettings(sanitized);
     setStatusMsg('Settings & rates updated successfully!');
     setTimeout(() => {
       setStatusMsg('');

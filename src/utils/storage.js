@@ -71,8 +71,10 @@ export function exportToJson(records, settings) {
   const a = document.createElement('a');
   a.href = url;
   a.download = `attendance_backup_${formatDateKey(new Date())}.json`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // Download data as CSV
@@ -92,10 +94,15 @@ export function exportToCsv(records, rates) {
     ]);
   }
 
-  const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.join(',')).join('\n');
-  const encodedUri = encodeURI(csvContent);
+  // Add UTF-8 BOM for accurate opening in Excel
+  const csvString = '\uFEFF' + rows.map(e => e.join(',')).join('\r\n');
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = encodedUri;
+  a.href = url;
   a.download = `attendance_records_${formatDateKey(new Date())}.csv`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { formatDateKey, formatINR, formatDisplayDate } from './utils/dateUtils';
 import { playEarnSound } from './utils/audio';
@@ -31,6 +31,7 @@ export default function App() {
   // Session / Auth State
   const [user, setUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
+  const loadedUserIdRef = useRef(null);
 
   // App Data (Loaded directly from user's account)
   const [records, setRecords] = useState({});
@@ -98,6 +99,7 @@ export default function App() {
       // 2. Fetch user attendance records
       const cloudRecords = await fetchUserAttendance(activeUser.id);
       setRecords(cloudRecords || {});
+      loadedUserIdRef.current = activeUser.id;
     } catch (err) {
       console.error('Failed to load user account data:', err);
       showToast('⚠️ Could not load attendance records from account.');
@@ -115,7 +117,7 @@ export default function App() {
     getCurrentSession().then(({ data }) => {
       const activeUser = data?.session?.user || null;
       setUser(activeUser);
-      if (activeUser) {
+      if (activeUser && loadedUserIdRef.current !== activeUser.id) {
         loadUserData(activeUser);
       }
       setAuthChecking(false);
@@ -129,9 +131,12 @@ export default function App() {
       setUser(activeUser);
 
       if (event === 'SIGNED_IN' && activeUser) {
-        loadUserData(activeUser);
-        showToast(`Signed in as ${activeUser.email}`);
+        if (loadedUserIdRef.current !== activeUser.id) {
+          loadUserData(activeUser);
+          showToast(`Signed in as ${activeUser.email}`);
+        }
       } else if (event === 'SIGNED_OUT') {
+        loadedUserIdRef.current = null;
         setRecords({});
         showToast('Signed out successfully.');
       }
