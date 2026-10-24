@@ -290,74 +290,81 @@ export default function App() {
       />
 
       {/* Main Tab Content */}
-      <main style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <main className="app-main-content">
         {/* Tab 1: Dashboard View */}
         {currentTab === 'dashboard' && (
-          <>
-            {/* Quick Daily Attendance Logger */}
-            <QuickLogger
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              records={records}
-              onSaveAttendance={handleSaveAttendance}
-              onDeleteAttendance={handleDeleteAttendance}
-              rates={rates}
-            />
+          <div className="dashboard-layout-container">
+            {/* Left Column: Quick Attendance Logger + Dashboard Stats Overview */}
+            <div className="dashboard-left-column">
+              <QuickLogger
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                records={records}
+                onSaveAttendance={handleSaveAttendance}
+                onDeleteAttendance={handleDeleteAttendance}
+                rates={rates}
+              />
 
-            {/* Dashboard Overview Cards */}
-            <DashboardStats
-              records={records}
-              currentYear={calendarYear}
-              currentMonth={calendarMonth}
-              selectedScope={dashboardScope}
-              setSelectedScope={setDashboardScope}
-              rates={rates}
-              settings={settings}
-            />
+              <DashboardStats
+                records={records}
+                currentYear={calendarYear}
+                currentMonth={calendarMonth}
+                selectedScope={dashboardScope}
+                setSelectedScope={setDashboardScope}
+                rates={rates}
+                settings={settings}
+              />
+            </div>
 
-            {/* Embedded Calendar Preview */}
-            <AttendanceCalendar
-              currentYear={calendarYear}
-              currentMonth={calendarMonth}
-              onChangeMonth={(y, m) => {
-                setCalendarYear(y);
-                setCalendarMonth(m);
-              }}
-              records={records}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              onOpenEditModal={(date) => setEditModal({ isOpen: true, date })}
-              rates={rates}
-            />
-          </>
+            {/* Right Column: Attendance Calendar */}
+            <div className="dashboard-right-column">
+              <AttendanceCalendar
+                currentYear={calendarYear}
+                currentMonth={calendarMonth}
+                onChangeMonth={(y, m) => {
+                  setCalendarYear(y);
+                  setCalendarMonth(m);
+                }}
+                records={records}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onOpenEditModal={(date) => setEditModal({ isOpen: true, date })}
+                rates={rates}
+              />
+            </div>
+          </div>
         )}
 
         {/* Tab 2: Calendar Dedicated View */}
         {currentTab === 'calendar' && (
-          <>
-            <QuickLogger
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              records={records}
-              onSaveAttendance={handleSaveAttendance}
-              onDeleteAttendance={handleDeleteAttendance}
-              rates={rates}
-            />
+          <div className="calendar-tab-container">
+            <div className="calendar-tab-sidebar">
+              <QuickLogger
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                records={records}
+                onSaveAttendance={handleSaveAttendance}
+                onDeleteAttendance={handleDeleteAttendance}
+                rates={rates}
+              />
+            </div>
 
-            <AttendanceCalendar
-              currentYear={calendarYear}
-              currentMonth={calendarMonth}
-              onChangeMonth={(y, m) => {
-                setCalendarYear(y);
-                setCalendarMonth(m);
-              }}
-              records={records}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              onOpenEditModal={(date) => setEditModal({ isOpen: true, date })}
-              rates={rates}
-            />
-          </>
+            <div className="calendar-tab-main">
+              <AttendanceCalendar
+                currentYear={calendarYear}
+                currentMonth={calendarMonth}
+                onChangeMonth={(y, m) => {
+                  setCalendarYear(y);
+                  setCalendarMonth(m);
+                }}
+                records={records}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onOpenEditModal={(date) => setEditModal({ isOpen: true, date })}
+                rates={rates}
+              />
+            </div>
+          </div>
         )}
 
         {/* Tab 3: History & Recent Logs View */}

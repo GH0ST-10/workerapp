@@ -79,112 +79,94 @@ export default function QuickLogger({
 
   return (
     <section className="glass-card quick-logger-card">
-      <div className="logger-header">
+      {/* Logger Card Header */}
+      <div className="logger-card-header">
         <div className="logger-title">
           <CalendarIcon size={18} color="var(--primary-accent)" />
-          <span>Mark Daily Attendance</span>
+          <span>Mark Attendance</span>
         </div>
 
-        {/* Date stepper */}
-        <div className="date-stepper">
+        {isToday ? (
+          <span className="today-badge">
+            Today
+          </span>
+        ) : (
           <button 
             type="button" 
-            className="date-stepper-btn" 
-            onClick={handlePrevDay}
-            title="Previous Day"
-            aria-label="Previous Day"
+            className="jump-today-btn"
+            onClick={handleToday}
+            title="Jump to today's date"
           >
-            <ChevronLeft size={16} />
+            Jump to Today
           </button>
-
-          <label className="date-stepper-display" title="Click to pick a custom date">
-            <span>{getRelativeDateLabel(selectedDate)}</span>
-            <input 
-              type="date" 
-              value={selectedDate} 
-              onChange={(e) => {
-                if (e.target.value) setSelectedDate(e.target.value);
-              }}
-              style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }}
-              id="quick-date-picker-input"
-            />
-          </label>
-
-          <button 
-            type="button" 
-            className="date-stepper-btn" 
-            onClick={handleNextDay}
-            title="Next Day"
-            aria-label="Next Day"
-          >
-            <ChevronRight size={16} />
-          </button>
-
-          {!isToday && (
-            <button 
-              type="button" 
-              onClick={handleToday}
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                color: 'var(--primary-accent)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                background: 'rgba(99, 102, 241, 0.1)'
-              }}
-            >
-              Today
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Date banner with input helper */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-secondary)' }}>
-        <div>
-          <strong>{formatDisplayDate(selectedDate, { includeWeekday: true })}</strong>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      {/* Unified Date Stepper & Picker Bar */}
+      <div className="logger-date-bar">
+        <button 
+          type="button" 
+          className="date-nav-arrow-btn" 
+          onClick={handlePrevDay}
+          title="Previous Day"
+          aria-label="Previous Day"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
+        <label className="date-picker-label" title="Tap to select custom date">
+          <CalendarIcon size={15} className="date-picker-icon" />
+          <span className="date-picker-text">
+            {formatDisplayDate(selectedDate, { includeWeekday: true })}
+          </span>
           <input 
             type="date" 
-            value={selectedDate}
+            value={selectedDate} 
             onChange={(e) => {
               if (e.target.value) setSelectedDate(e.target.value);
             }}
-            style={{
-              padding: '4px 8px',
-              fontSize: '12px',
-              borderRadius: '6px'
-            }}
+            className="date-picker-hidden-input"
+            id="quick-date-picker-input"
           />
-        </div>
+        </label>
+
+        <button 
+          type="button" 
+          className="date-nav-arrow-btn" 
+          onClick={handleNextDay}
+          title="Next Day"
+          aria-label="Next Day"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
 
-      {/* Current logged status alert if present */}
+      {/* Current logged status alert */}
       {currentRecord ? (
-        <div className="current-status-banner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="current-status-banner recorded">
+          <div className="status-text-row">
             <span 
               className="dot-indicator" 
               style={{ backgroundColor: ATTENDANCE_TYPES[currentType]?.color || '#94a3b8' }} 
             />
             <span>
-              Recorded: <strong>{ATTENDANCE_TYPES[currentType]?.label}</strong> ({formatINR(currentWage)} credited)
-              {currentRecord.note && <span style={{ opacity: 0.8, fontStyle: 'italic' }}> — "{currentRecord.note}"</span>}
+              Recorded: <strong style={{ color: ATTENDANCE_TYPES[currentType]?.color }}>{ATTENDANCE_TYPES[currentType]?.label}</strong> ({formatINR(currentWage)})
+              {currentRecord.note && <span className="status-note-text"> — "{currentRecord.note}"</span>}
             </span>
           </div>
           <button 
+            type="button"
             className="clear-record-btn" 
             onClick={() => onDeleteAttendance(selectedDate)}
             title="Remove record for this date"
           >
-            <Trash2 size={13} style={{ verticalAlign: 'middle', marginRight: 2 }} />
-            Clear
+            <Trash2 size={13} />
+            <span>Clear</span>
           </button>
         </div>
       ) : (
-        <div className="current-status-banner" style={{ color: 'var(--text-muted)' }}>
-          <span>No attendance recorded yet for this date. Select an option below:</span>
+        <div className="current-status-banner unrecorded">
+          <span>Tap an option below to record attendance:</span>
         </div>
       )}
 

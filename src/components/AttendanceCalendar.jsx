@@ -2,8 +2,7 @@ import React from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Calendar as CalIcon,
-  Plus
+  Calendar as CalIcon
 } from 'lucide-react';
 import { getCalendarGrid, formatDateKey, formatINR } from '../utils/dateUtils';
 import { ATTENDANCE_TYPES } from '../constants';
@@ -93,36 +92,19 @@ export default function AttendanceCalendar({
 
           <button
             type="button"
+            className="cal-today-shortcut"
             onClick={handleTodayMonth}
-            style={{
-              fontSize: '12px',
-              fontWeight: 700,
-              color: 'var(--primary-accent)',
-              padding: '6px 10px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-color)',
-              marginLeft: 4
-            }}
+            title="Jump to current month"
           >
             Today
           </button>
         </div>
 
         {/* Monthly quick badge */}
-        <div style={{
-          fontSize: '12px',
-          fontWeight: 600,
-          background: 'var(--bg-input)',
-          padding: '6px 12px',
-          borderRadius: 'var(--radius-full)',
-          border: '1px solid var(--border-color)',
-          display: 'flex',
-          gap: 8
-        }}>
+        <div className="calendar-month-summary-badge">
           <span><strong>{monthWorkDays}</strong> shifts</span>
-          <span>•</span>
-          <span style={{ color: 'var(--color-full)' }}><strong>{formatINR(monthEarnings)}</strong></span>
+          <span className="badge-divider">•</span>
+          <span className="badge-amount">{formatINR(monthEarnings)}</span>
         </div>
       </div>
 
@@ -165,9 +147,11 @@ export default function AttendanceCalendar({
               className={`cal-day-cell ${!cell.isCurrentMonth ? 'other-month' : ''} ${cell.isToday ? 'is-today' : ''} ${isSelected ? 'selected-date' : ''}`}
               onClick={() => {
                 onSelectDate(cell.dateKey);
-                onOpenEditModal(cell.dateKey);
+                if (type) {
+                  onOpenEditModal(cell.dateKey);
+                }
               }}
-              title={`${cell.dateKey}: ${type ? ATTENDANCE_TYPES[type].label : 'No attendance'}. Click to edit.`}
+              title={`${cell.dateKey}: ${type ? ATTENDANCE_TYPES[type].label : 'No attendance'}. Click to log or edit.`}
             >
               {/* Day Number */}
               <div className="cal-day-number">
@@ -177,18 +161,16 @@ export default function AttendanceCalendar({
               {/* Status Badge if logged */}
               {type ? (
                 <div className={`cal-day-badge ${type.toLowerCase()}`}>
-                  <span style={{ textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.3px' }}>
+                  <span className="cal-badge-type">
                     {ATTENDANCE_TYPES[type].shortLabel}
                   </span>
                   <span className="cal-badge-amount">
                     {formatINR(wage)}
                   </span>
                 </div>
-              ) : cell.isCurrentMonth ? (
-                <div style={{ opacity: 0.25, fontSize: '10px' }}>
-                  <Plus size={12} />
-                </div>
-              ) : null}
+              ) : (
+                <div className="cal-day-empty-placeholder" />
+              )}
             </div>
           );
         })}

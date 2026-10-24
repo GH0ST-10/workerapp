@@ -6,9 +6,8 @@ import {
   CalendarDays, 
   LayoutDashboard, 
   History, 
-  FileText,
-  LogOut,
-  User
+  FileText, 
+  LogOut 
 } from 'lucide-react';
 
 export default function Header({ 
@@ -16,19 +15,23 @@ export default function Header({
   setCurrentTab, 
   theme, 
   toggleTheme, 
-  openSettings,
-  user,
-  onSignOut
+  openSettings, 
+  user, 
+  onSignOut 
 }) {
+  const username = user?.email ? user.email.split('@')[0] : 'User';
+  const avatarLetter = (user?.email || 'U')[0].toUpperCase();
+
   return (
     <header className="app-header">
-      <div className="brand-badge">
+      {/* Brand */}
+      <div className="brand-badge" onClick={() => setCurrentTab('dashboard')} style={{ cursor: 'pointer' }}>
         <div className="brand-icon-box">
-          <CalendarDays size={22} strokeWidth={2.4} />
+          <CalendarDays size={20} strokeWidth={2.4} />
         </div>
         <div className="brand-text">
           <h1>WorkTrack</h1>
-          <p>Attendance & Earnings</p>
+          <p>Attendance & Pay</p>
         </div>
       </div>
 
@@ -38,86 +41,46 @@ export default function Header({
           className={`desktop-tab-btn ${currentTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setCurrentTab('dashboard')}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <LayoutDashboard size={16} />
-            Dashboard
-          </span>
+          <LayoutDashboard size={15} />
+          <span>Dashboard</span>
         </button>
         <button
           className={`desktop-tab-btn ${currentTab === 'calendar' ? 'active' : ''}`}
           onClick={() => setCurrentTab('calendar')}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <CalendarDays size={16} />
-            Calendar
-          </span>
+          <CalendarDays size={15} />
+          <span>Calendar</span>
         </button>
         <button
           className={`desktop-tab-btn ${currentTab === 'history' ? 'active' : ''}`}
           onClick={() => setCurrentTab('history')}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <History size={16} />
-            History
-          </span>
+          <History size={15} />
+          <span>History</span>
         </button>
         <button
           className={`desktop-tab-btn ${currentTab === 'summary' ? 'active' : ''}`}
           onClick={() => setCurrentTab('summary')}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <FileText size={16} />
-            Summary & Slip
-          </span>
+          <FileText size={15} />
+          <span>Slip</span>
         </button>
       </nav>
 
-      {/* Header Action Buttons & User Profile */}
+      {/* Action Controls & User Account */}
       <div className="header-actions">
         {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-color)',
-                fontSize: '12px',
-                fontWeight: 600
-              }}
-              title={`Logged in as ${user.email}`}
-            >
-              <div style={{
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: 'var(--primary-accent)',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '11px',
-                fontWeight: 800
-              }}>
-                {(user.email || 'U')[0].toUpperCase()}
-              </div>
-              <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {user.email?.split('@')[0]}
-              </span>
+          <div 
+            className="user-profile-chip" 
+            title={`Logged in as ${user.email} (Click to open settings)`}
+            onClick={openSettings}
+          >
+            <div className="user-avatar-circle">
+              {avatarLetter}
             </div>
-
-            <button
-              className="icon-btn"
-              onClick={onSignOut}
-              title="Sign Out from account"
-              aria-label="Sign Out"
-              style={{ width: 34, height: 34, color: 'var(--color-absent)' }}
-            >
-              <LogOut size={16} />
-            </button>
+            <span className="user-display-name">
+              {username}
+            </span>
           </div>
         )}
 
@@ -127,17 +90,28 @@ export default function Header({
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           aria-label="Toggle theme"
         >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
         </button>
 
         <button 
           className="icon-btn" 
           onClick={openSettings} 
-          title="Profile & Settings"
+          title="Profile & Wage Settings"
           aria-label="Open settings"
         >
-          <SettingsIcon size={18} />
+          <SettingsIcon size={17} />
         </button>
+
+        {user && (
+          <button
+            className="icon-btn logout-btn"
+            onClick={onSignOut}
+            title="Sign Out from account"
+            aria-label="Sign Out"
+          >
+            <LogOut size={16} />
+          </button>
+        )}
       </div>
     </header>
   );
