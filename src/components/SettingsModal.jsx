@@ -18,8 +18,20 @@ export default function SettingsModal({
   settings, 
   onSaveSettings 
 }) {
-  const [formData, setFormData] = useState({ ...settings });
+  const [formData, setFormData] = useState({ 
+    ...settings,
+    rates: settings?.rates || { FULL: 500, HALF: 300, ABSENT: 0 }
+  });
   const [statusMsg, setStatusMsg] = useState('');
+
+  React.useEffect(() => {
+    if (settings) {
+      setFormData({
+        ...settings,
+        rates: settings.rates || { FULL: 500, HALF: 300, ABSENT: 0 }
+      });
+    }
+  }, [settings, isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,10 +39,21 @@ export default function SettingsModal({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleRateChange = (type, value) => {
+    const num = Math.max(0, parseInt(value, 10) || 0);
+    setFormData(prev => ({
+      ...prev,
+      rates: {
+        ...(prev.rates || { FULL: 500, HALF: 300, ABSENT: 0 }),
+        [type]: num
+      }
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSaveSettings(formData);
-    setStatusMsg('Profile updated successfully!');
+    setStatusMsg('Settings & rates updated successfully!');
     setTimeout(() => {
       setStatusMsg('');
       onClose();
@@ -158,18 +181,66 @@ export default function SettingsModal({
             />
           </div>
 
-          {/* Wage Rate Info */}
+          {/* Editable Daily Wage Rates */}
           <div style={{
             background: 'var(--bg-input)',
-            padding: '10px 14px',
+            padding: '14px',
             borderRadius: 'var(--radius-md)',
-            fontSize: '12px',
+            border: '1px solid var(--border-color)',
             display: 'flex',
-            justifyContent: 'space-between',
-            color: 'var(--text-secondary)'
+            flexDirection: 'column',
+            gap: 10
           }}>
-            <span>Wage Rules:</span>
-            <span><strong>Full Day: ₹500</strong> • <strong>Half Day: ₹300</strong> • <strong>Absent: ₹0</strong></span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Daily Wage Rates (₹)
+              </span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Absent = ₹0
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                  Full Day Rate (₹)
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: 'var(--color-full)' }}>₹</span>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={formData.rates?.FULL ?? 500}
+                    onChange={(e) => handleRateChange('FULL', e.target.value)}
+                    style={{ width: '100%', paddingLeft: 24, fontWeight: 700, fontSize: '13.5px' }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                  Half Day Rate (₹)
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: 'var(--color-half)' }}>₹</span>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={formData.rates?.HALF ?? 300}
+                    onChange={(e) => handleRateChange('HALF', e.target.value)}
+                    style={{ width: '100%', paddingLeft: 24, fontWeight: 700, fontSize: '13.5px' }}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              Change daily rates anytime. All calculations and slips will automatically use these rates.
+            </span>
           </div>
 
           {/* Save Button */}
