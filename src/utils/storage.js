@@ -1,5 +1,5 @@
-import { STORAGE_KEYS, DEFAULT_RATES } from '../constants';
-import { generateInitialRecords, formatDateKey } from './dateUtils';
+import { STORAGE_KEYS, DEFAULT_RATES } from '../constants.js';
+import { generateInitialRecords, formatDateKey } from './dateUtils.js';
 
 // Load attendance records (starts empty with real user data only)
 export function loadRecords() {
