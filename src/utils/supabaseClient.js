@@ -50,6 +50,18 @@ export async function signOutUser() {
   return await supabase.auth.signOut();
 }
 
+export async function resetPasswordForEmail(email) {
+  if (!supabase) throw new Error('Backend service configuration missing.');
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/#recovery`
+  });
+}
+
+export async function updateUserPassword(newPassword) {
+  if (!supabase) throw new Error('Backend service configuration missing.');
+  return await supabase.auth.updateUser({ password: newPassword });
+}
+
 export async function getCurrentSession() {
   if (!supabase) return { data: { session: null }, error: null };
   return await supabase.auth.getSession();
